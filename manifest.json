@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Speech to Text Recorder",
+  "version": "1.0",
+  "description": "Record speech and convert to text in any text area.",
+  "permissions": ["activeTab", "microphone", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "css": ["styles.css"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
