@@ -21,6 +21,10 @@
   animation: pulse 1s infinite alternate;
 }
 
+.fa-stop {
+  overflow: hidden;
+}
+
 .icon {
   display: inline-flex;
   align-items: center;
