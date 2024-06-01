@@ -4,21 +4,53 @@
     <title>Speech to Text</title>
     <style>
       body {
-        width: 200px;
+        width: 250px;
         font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
-      button {
-        width: 100%;
-        padding: 10px;
-        margin: 5px 0;
-        font-size: 16px;
+      h2 {
+        margin: 0;
+        color: #333;
+      }
+      .toggle-button {
+        width: 100px;
+        height: 50px;
+        background-color: #ddd;
+        border: none;
+        border-radius: 25px;
+        position: relative;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: background-color 0.3s ease;
+      }
+      .toggle-button:before {
+        content: "";
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        width: 40px;
+        height: 40px;
+        background-color: #fff;
+        border-radius: 50%;
+        transition: left 0.3s ease;
+      }
+      .toggle-button.enabled {
+        background-color: #4caf50;
+      }
+      .toggle-button.enabled:before {
+        left: 55px;
       }
     </style>
   </head>
   <body>
-    <h3>Speech to Text</h3>
-    <button id="enable">Enable</button>
-    <button id="disable">Disable</button>
+    <h2>Speech to Text</h2>
+    <button id="toggleButton" class="toggle-button"></button>
     <script src="popup.js"></script>
   </body>
 </html>
