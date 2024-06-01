@@ -3,14 +3,23 @@
   "name": "Speech to Text Recorder",
   "version": "1.0",
   "description": "Record speech and convert to text in any text area.",
-  "permissions": ["activeTab", "microphone", "scripting"],
+  "permissions": [
+    "activeTab",
+    "microphone",
+    "scripting",
+    "storage",
+    "tabs",
+    "<all_urls>"
+  ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "css": ["styles.css"]
+      "css": ["styles.css"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
     }
   ],
   "action": {

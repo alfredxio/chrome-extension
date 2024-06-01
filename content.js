@@ -1,4 +1,5 @@
 var isRecording = false;
+
 function addRecordButton(textArea) {
   if (
     textArea.nextSibling &&
@@ -43,7 +44,16 @@ function addRecordButton(textArea) {
 
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
-    textArea.value += transcript;
+    function simulateTyping(transcript) {
+      transcript.split("").forEach((char) => {
+        textArea.dispatchEvent(new KeyboardEvent("keydown", { key: char }));
+        textArea.dispatchEvent(new KeyboardEvent("keypress", { key: char }));
+        textArea.value += char;
+        textArea.dispatchEvent(new Event("input", { bubbles: true }));
+        textArea.dispatchEvent(new KeyboardEvent("keyup", { key: char }));
+      });
+    }
+    simulateTyping(transcript);
     recordButton.innerText = "Record";
     recordButton.classList.remove("recording");
     isRecording = false;
@@ -71,10 +81,26 @@ function addRecordButton(textArea) {
   });
 }
 
-document.querySelectorAll("textarea").forEach(addRecordButton);
+function enableSpeechToText() {
+  document.querySelectorAll("textarea").forEach(addRecordButton);
+  document.addEventListener("focusin", (event) => {
+    if (event.target.tagName === "TEXTAREA") {
+      addRecordButton(event.target);
+    }
+  });
+}
 
-document.addEventListener("focusin", (event) => {
-  if (event.target.tagName === "TEXTAREA") {
-    addRecordButton(event.target);
+function disableSpeechToText() {
+  document
+    .querySelectorAll(".record-button")
+    .forEach((button) => button.remove());
+}
+
+chrome.storage.local.get(["activatedSites"], (result) => {
+  const activatedSites = result.activatedSites || [];
+  const currentSite = window.location.hostname;
+
+  if (activatedSites.includes(currentSite)) {
+    enableSpeechToText();
   }
 });
