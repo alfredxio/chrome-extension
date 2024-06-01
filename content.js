@@ -1,4 +1,6 @@
 var isRecording = false;
+var recordIcon = '<i class="fas fa-microphone-alt icon"></i>';
+var stopIcon = '<i class="fas fa-stop icon"></i>';
 
 function addRecordButton(textArea) {
   if (
@@ -9,13 +11,8 @@ function addRecordButton(textArea) {
     return;
 
   const recordButton = document.createElement("button");
-  recordButton.innerText = "Record";
+  recordButton.innerHTML = recordIcon;
   recordButton.classList.add("record-button");
-
-  recordButton.style.position = "absolute";
-  recordButton.style.bottom = "10px";
-  recordButton.style.right = "10px";
-  recordButton.style.zIndex = "10";
 
   const wrapper = document.createElement("div");
   wrapper.style.position = "relative";
@@ -54,27 +51,26 @@ function addRecordButton(textArea) {
       });
     }
     simulateTyping(transcript);
-    recordButton.innerText = "Record";
+    recordButton.innerHTML = recordIcon;
     recordButton.classList.remove("recording");
     isRecording = false;
   };
 
   recognition.onerror = (event) => {
-    console.error("Speech recognition error", event);
-    recordButton.innerText = "Record";
+    recordButton.innerHTML = recordIcon;
     recordButton.classList.remove("recording");
     isRecording = false;
   };
 
   recordButton.addEventListener("click", () => {
-    if (recordButton.innerText === "Record" && !isRecording) {
+    if ((recordButton.innerHTML = recordIcon && !isRecording)) {
       isRecording = true;
-      recordButton.innerText = "Stop";
+      recordButton.innerHTML = stopIcon;
       recordButton.classList.add("recording");
       recognition.start();
-    } else if (recordButton.innerText === "Stop") {
+    } else if ((recordButtoninnerHTML = stopIcon)) {
       recognition.stop();
-      recordButton.innerText = "Record";
+      recordButton.innerHTML = recordIcon;
       recordButton.classList.remove("recording");
       isRecording = false;
     }
@@ -103,4 +99,25 @@ chrome.storage.local.get(["activatedSites"], (result) => {
   if (activatedSites.includes(currentSite)) {
     enableSpeechToText();
   }
+});
+
+function handleActivatedSitesChange(activatedSites) {
+  const currentSite = window.location.hostname;
+  if (activatedSites.includes(currentSite)) {
+    enableSpeechToText();
+  } else {
+    disableSpeechToText();
+  }
+}
+
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+  if (namespace === "local" && changes.hasOwnProperty("activatedSites")) {
+    const activatedSites = changes.activatedSites.newValue || [];
+    handleActivatedSitesChange(activatedSites);
+  }
+});
+
+chrome.storage.local.get(["activatedSites"], function (result) {
+  const activatedSites = result.activatedSites || [];
+  handleActivatedSitesChange(activatedSites);
 });
