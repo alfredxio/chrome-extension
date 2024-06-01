@@ -74,8 +74,11 @@ function addRecordButton(textArea) {
       isRecording = true;
       recordButton.innerHTML = stopIcon;
       recordButton.classList.add("recording");
-      recognition.start();
-    } else if ((recordButtoninnerHTML = stopIcon)) {
+      chrome.storage.local.get(["language"], (result) => {
+        recognition.lang = result.language || "en-US";
+        recognition.start();
+      });
+    } else {
       recognition.stop();
       recordButton.innerHTML = recordIcon;
       recordButton.classList.remove("recording");

@@ -13,11 +13,17 @@
         margin: 0;
         padding: 20px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        font-family: "Helvetica Neue", sans-serif;
       }
       h2 {
         margin: 0;
         color: #333;
-        font-family: "Helvetica Neue", sans-serif;
+      }
+      h3 {
+        margin: 20px 0 10px 0;
+        color: #333;
+        text-align: left;
+        width: 100%;
       }
       .toggle-button {
         width: 100px;
@@ -47,11 +53,40 @@
       .toggle-button.enabled:before {
         left: 55px;
       }
+      select {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      p {
+        margin-top: 15px;
+        font-size: 11px;
+        color: #333;
+        text-align: justify;
+      }
     </style>
   </head>
   <body>
     <h2>Speech to Text</h2>
     <button id="toggleButton" class="toggle-button"></button>
+    <h3>Select Language:</h3>
+    <select id="languageSelect">
+      <option value="en-US">English (US)</option>
+      <option value="en-GB">English (UK)</option>
+      <option value="hi-IN">Hindi</option>
+      <option value="es-ES">Spanish (Spain)</option>
+      <option value="fr-FR">French</option>
+      <option value="de-DE">German</option>
+    </select>
+    <p>
+      This is a chrome extension that adds Speech to Text functionality to all
+      text areas on the page. Enable the extension by clicking the button above.
+      Click on record button in the text area to start recording and click again
+      to stop recording. The text will be automatically transcribed and added to
+      the text area.
+    </p>
     <script src="popup.js"></script>
   </body>
 </html>

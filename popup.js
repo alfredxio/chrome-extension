@@ -1,11 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
   const toggleButton = document.getElementById("toggleButton");
+  const languageSelect = document.getElementById("languageSelect");
 
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const currentSite = new URL(tabs[0].url).hostname;
+  chrome.storage.local.get(["activatedSites", "language"], (result) => {
+    const activatedSites = result.activatedSites || [];
+    const language = result.language || "en-US";
+    languageSelect.value = language;
 
-    chrome.storage.local.get(["activatedSites"], (result) => {
-      const activatedSites = result.activatedSites || [];
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const currentSite = new URL(tabs[0].url).hostname;
       if (activatedSites.includes(currentSite)) {
         toggleButton.classList.add("enabled");
       }
@@ -15,10 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
   toggleButton.addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const currentSite = new URL(tabs[0].url).hostname;
-
       chrome.storage.local.get(["activatedSites"], (result) => {
         let activatedSites = result.activatedSites || [];
-
         if (toggleButton.classList.contains("enabled")) {
           activatedSites = activatedSites.filter(
             (site) => site !== currentSite
@@ -42,6 +43,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     });
+  });
+
+  languageSelect.addEventListener("change", () => {
+    const selectedLanguage = languageSelect.value;
+    chrome.storage.local.set({ language: selectedLanguage });
   });
 });
 
