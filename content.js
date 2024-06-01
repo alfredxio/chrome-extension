@@ -1,4 +1,4 @@
-let isRecording = false;
+var isRecording = false;
 function addRecordButton(textArea) {
   if (
     textArea.nextSibling &&
