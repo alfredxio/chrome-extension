@@ -1,7 +1,4 @@
-console.log("Speech to Text Extension Installed");
-
 let isRecording = false;
-
 function addRecordButton(textArea) {
   if (
     textArea.nextSibling &&
@@ -10,20 +7,25 @@ function addRecordButton(textArea) {
   )
     return;
 
-  const container = document.createElement("div");
-  container.style.position = "relative";
-
-  textArea.parentNode.insertBefore(container, textArea);
-  container.appendChild(textArea);
-
   const recordButton = document.createElement("button");
   recordButton.innerText = "Record";
   recordButton.classList.add("record-button");
+
   recordButton.style.position = "absolute";
   recordButton.style.bottom = "10px";
   recordButton.style.right = "10px";
+  recordButton.style.zIndex = "10";
 
-  container.appendChild(recordButton);
+  const wrapper = document.createElement("div");
+  wrapper.style.position = "relative";
+  wrapper.style.display = "inline-block";
+  wrapper.style.width = textArea.offsetWidth + "px";
+  wrapper.style.height = textArea.offsetHeight + "px";
+
+  textArea.parentNode.insertBefore(wrapper, textArea);
+  wrapper.appendChild(textArea);
+  wrapper.appendChild(recordButton);
+  textArea.style.width = "100%";
 
   let recognition;
 
@@ -41,7 +43,6 @@ function addRecordButton(textArea) {
 
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
-    console.log(`Confidence: e`, event.results[0][0]);
     textArea.value += transcript;
     recordButton.innerText = "Record";
     recordButton.classList.remove("recording");
