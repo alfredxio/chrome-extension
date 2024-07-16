@@ -14,10 +14,22 @@
         font-size: 16px;
         resize: none;
       }
+      #text3 {
+        display: none;
+        width: 1000px;
+      }
     </style>
+    <script>
+      setTimeout(() => {
+        const text3 = document.createElement("textarea");
+        const randomDiv = document.getElementById("random_div");
+        randomDiv.appendChild(text3);
+      }, 5000);
+    </script>
   </head>
   <body>
     <textarea id="text1" placeholder="Enter text here"></textarea>
     <textarea id="text2" placeholder="Enter text here"></textarea>
+    <div id="random_div"></div>
   </body>
 </html>
