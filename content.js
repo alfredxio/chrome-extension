@@ -42,12 +42,12 @@ function addRecordButton(textArea) {
   }
 
   recognition = new webkitSpeechRecognition();
-  recognition.continuous = false;
+  recognition.continuous = true;
   recognition.interimResults = false;
   recognition.lang = "en-US";
 
   recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
+    const transcript = event.results[event.results.length - 1][0].transcript;
     function simulateTyping(transcript) {
       transcript.split("").forEach((char) => {
         textArea.dispatchEvent(new KeyboardEvent("keydown", { key: char }));
@@ -58,19 +58,16 @@ function addRecordButton(textArea) {
       });
     }
     simulateTyping(transcript);
-    recordButton.innerHTML = recordIcon;
-    recordButton.classList.remove("recording");
-    isRecording = false;
   };
 
-  recognition.onerror = (event) => {
+  recognition.onerror = () => {
     recordButton.innerHTML = recordIcon;
     recordButton.classList.remove("recording");
     isRecording = false;
   };
 
   recordButton.addEventListener("click", () => {
-    if ((recordButton.innerHTML = recordIcon && !isRecording)) {
+    if (!isRecording) {
       isRecording = true;
       recordButton.innerHTML = stopIcon;
       recordButton.classList.add("recording");
@@ -79,20 +76,27 @@ function addRecordButton(textArea) {
         recognition.start();
       });
     } else {
+      isRecording = false;
       recognition.stop();
       recordButton.innerHTML = recordIcon;
       recordButton.classList.remove("recording");
-      isRecording = false;
     }
   });
 }
 
 function enableSpeechToText() {
   document.querySelectorAll("textarea").forEach(addRecordButton);
-  document.addEventListener("focusin", (event) => {
-    if (event.target.tagName === "TEXTAREA") {
-      addRecordButton(event.target);
-    }
+  document.addEventListener("mouseover", (event) => {
+    chrome.storage.local.get(["activatedSites"], function (result) {
+      const activatedSites = result.activatedSites || [];
+      const currentSite = window.location.hostname;
+      if (
+        event.target.tagName === "TEXTAREA" &&
+        activatedSites.includes(currentSite)
+      ) {
+        addRecordButton(event.target);
+      }
+    });
   });
 }
 
