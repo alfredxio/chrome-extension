@@ -133,15 +133,14 @@ function addRecordButton(textArea) {
         recognition.start();
       });
     } else {
-      isRecording = false;
-      recognition.stop();
-      recordButton.innerHTML = recordIcon;
+      await recognition.stop();
       recordButton.classList.remove("recording");
-
       if (autoSummarizeOn) {
         const query = `${recognisedText} \n Summarize the above text. Respond with only the summary nothing else.`;
         let finalTranscript = "";
         try {
+          recordButton.innerHTML = loadingIcon;
+          recordButton.classList.add("loading");
           finalTranscript = await aiCompletion(query);
           await simulateBackspace(textArea, recognisedText.length, true);
           await simulateTyping(textArea, finalTranscript, true);
@@ -150,6 +149,9 @@ function addRecordButton(textArea) {
           console.error("Error:", error);
         }
       }
+      isRecording = false;
+      recordButton.innerHTML = recordIcon;
+      recordButton.classList.remove("loading");
     }
   });
 }
