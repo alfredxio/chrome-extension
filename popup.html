@@ -20,10 +20,12 @@
         color: #333;
       }
       h3 {
-        margin: 20px 0 10px 0;
         color: #333;
         text-align: left;
         width: 100%;
+      }
+      .sellang {
+        margin: 20px 0 10px 0;
       }
       .toggle-button {
         width: 100px;
@@ -66,12 +68,24 @@
         color: #333;
         text-align: justify;
       }
+      .checkbox-container {
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-top: 15px;
+      }
+      .checkbox-container input[type="checkbox"] {
+        transform: scale(1.5);
+        cursor: pointer;
+        margin-right: 15px;
+      }
     </style>
   </head>
   <body>
     <h2>Speech to Text</h2>
     <button id="toggleButton" class="toggle-button"></button>
-    <h3>Select Language:</h3>
+    <h3 class="sellang">Select Language:</h3>
     <select id="languageSelect">
       <option value="en-US">English (US)</option>
       <option value="en-GB">English (UK)</option>
@@ -80,6 +94,10 @@
       <option value="fr-FR">French</option>
       <option value="de-DE">German</option>
     </select>
+    <div class="checkbox-container">
+      <input type="checkbox" id="autoSummarizeCheckbox" />
+      <h3>Auto Summarize</h3>
+    </div>
     <p>
       This is a chrome extension that adds Speech to Text functionality to all
       text areas on the page. Enable the extension by clicking the button above.

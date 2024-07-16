@@ -2,17 +2,18 @@
   background-color: #bfbfbf;
   color: rgb(36, 36, 36);
   border: none;
-  height: 40px;
-  width: 40px;
+  height: 35px;
+  width: 35px;
   text-align: center;
   text-decoration: none;
-  display: inline-block;
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  border-radius: 20px;
+  border-radius: 50%;
   position: absolute;
-  bottom: 10px;
-  right: 10px;
+  bottom: 5px;
+  right: 5px;
   z-index: 10;
 }
 
@@ -21,18 +22,13 @@
   animation: pulse 1s infinite alternate;
 }
 
-.fa-stop {
-  overflow: hidden;
+.loading {
+  animation: spin 2s infinite linear;
 }
 
-.icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 10px;
-  height: 10px;
-  margin: 0;
-  padding: 0;
+.fa-stop {
+  overflow: hidden;
+  font-size: 10px;
 }
 
 @keyframes pulse {
@@ -41,5 +37,14 @@
   }
   100% {
     transform: scale(1.1);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }

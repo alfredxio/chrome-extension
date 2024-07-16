@@ -1,6 +1,7 @@
 var isRecording = false;
 var recordIcon = '<i class="fas fa-microphone-alt icon"></i>';
 var stopIcon = '<i class="fas fa-stop icon"></i>';
+var loadingIcon = '<i class="fas fa-spinner icon"></i>';
 
 (function () {
   var link = document.createElement("link");
@@ -9,6 +10,68 @@ var stopIcon = '<i class="fas fa-stop icon"></i>';
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css";
   document.head.appendChild(link);
 })();
+
+async function aiCompletion(prompt) {
+  try {
+    const response = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            "Bearer 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",
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "system",
+              content: prompt,
+            },
+          ],
+          model: "llama3-8b-8192",
+          temperature: 1,
+          max_tokens: 1024,
+          top_p: 1,
+          stream: false,
+          stop: null,
+        }),
+      }
+    );
+
+    const data = await response.json();
+    return data.choices[0]?.message?.content || "";
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+
+async function simulateTyping(textArea, transcript, addDelay = false) {
+  for (const char of transcript) {
+    textArea.dispatchEvent(new KeyboardEvent("keydown", { key: char }));
+    textArea.dispatchEvent(new KeyboardEvent("keypress", { key: char }));
+    textArea.value += char;
+    textArea.dispatchEvent(new Event("input", { bubbles: true }));
+    textArea.dispatchEvent(new KeyboardEvent("keyup", { key: char }));
+    if (addDelay && char === " " && Math.floor(Math.random() * 2) === 0) {
+      await new Promise((resolve) => setTimeout(resolve, 80));
+    }
+  }
+}
+
+async function simulateBackspace(textArea, count, addDelay = false) {
+  for (let i = 0; i < count; i++) {
+    textArea.dispatchEvent(new KeyboardEvent("keydown", { key: "Backspace" }));
+    textArea.dispatchEvent(new KeyboardEvent("keypress", { key: "Backspace" }));
+    textArea.value = textArea.value.slice(0, -1);
+    textArea.dispatchEvent(new Event("input", { bubbles: true }));
+    textArea.dispatchEvent(new KeyboardEvent("keyup", { key: "Backspace" }));
+    if (addDelay) {
+      await new Promise((resolve) => setTimeout(resolve, 5));
+    }
+  }
+}
 
 function addRecordButton(textArea) {
   if (
@@ -23,9 +86,8 @@ function addRecordButton(textArea) {
 
   const wrapper = document.createElement("div");
   wrapper.style.position = "relative";
-  wrapper.style.display = "inline-block";
-  wrapper.style.width = textArea.offsetWidth + "px";
-  wrapper.style.height = textArea.offsetHeight + "px";
+  wrapper.style.display = "flex";
+  wrapper.style.flex = "1";
 
   textArea.parentNode.insertBefore(wrapper, textArea);
   wrapper.appendChild(textArea);
@@ -33,6 +95,8 @@ function addRecordButton(textArea) {
   textArea.style.width = "100%";
 
   let recognition;
+  let autoSummarizeOn = false;
+  let recognisedText = "";
 
   if (!("webkitSpeechRecognition" in window)) {
     alert(
@@ -46,18 +110,10 @@ function addRecordButton(textArea) {
   recognition.interimResults = false;
   recognition.lang = "en-US";
 
-  recognition.onresult = (event) => {
+  recognition.onresult = async (event) => {
     const transcript = event.results[event.results.length - 1][0].transcript;
-    function simulateTyping(transcript) {
-      transcript.split("").forEach((char) => {
-        textArea.dispatchEvent(new KeyboardEvent("keydown", { key: char }));
-        textArea.dispatchEvent(new KeyboardEvent("keypress", { key: char }));
-        textArea.value += char;
-        textArea.dispatchEvent(new Event("input", { bubbles: true }));
-        textArea.dispatchEvent(new KeyboardEvent("keyup", { key: char }));
-      });
-    }
-    simulateTyping(transcript);
+    recognisedText += transcript;
+    await simulateTyping(textArea, transcript);
   };
 
   recognition.onerror = () => {
@@ -66,13 +122,14 @@ function addRecordButton(textArea) {
     isRecording = false;
   };
 
-  recordButton.addEventListener("click", () => {
+  recordButton.addEventListener("click", async () => {
     if (!isRecording) {
       isRecording = true;
       recordButton.innerHTML = stopIcon;
       recordButton.classList.add("recording");
-      chrome.storage.local.get(["language"], (result) => {
+      chrome.storage.local.get(["language", "autoSummarizeOn"], (result) => {
         recognition.lang = result.language || "en-US";
+        autoSummarizeOn = result.autoSummarizeOn || false;
         recognition.start();
       });
     } else {
@@ -80,6 +137,19 @@ function addRecordButton(textArea) {
       recognition.stop();
       recordButton.innerHTML = recordIcon;
       recordButton.classList.remove("recording");
+
+      if (autoSummarizeOn) {
+        const query = `${recognisedText} \n Summarize the above text. Respond with only the summary nothing else.`;
+        let finalTranscript = "";
+        try {
+          finalTranscript = await aiCompletion(query);
+          await simulateBackspace(textArea, recognisedText.length, true);
+          await simulateTyping(textArea, finalTranscript, true);
+          recognisedText = "";
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      }
     }
   });
 }
@@ -87,16 +157,15 @@ function addRecordButton(textArea) {
 function enableSpeechToText() {
   document.querySelectorAll("textarea").forEach(addRecordButton);
   document.addEventListener("mouseover", (event) => {
-    chrome.storage.local.get(["activatedSites"], function (result) {
-      const activatedSites = result.activatedSites || [];
-      const currentSite = window.location.hostname;
-      if (
-        event.target.tagName === "TEXTAREA" &&
-        activatedSites.includes(currentSite)
-      ) {
-        addRecordButton(event.target);
-      }
-    });
+    if (event.target.tagName === "TEXTAREA") {
+      chrome.storage.local.get(["activatedSites"], function (result) {
+        const activatedSites = result.activatedSites || [];
+        const currentSite = window.location.hostname;
+        if (activatedSites.includes(currentSite)) {
+          addRecordButton(event.target);
+        }
+      });
+    }
   });
 }
 

@@ -1,19 +1,28 @@
 document.addEventListener("DOMContentLoaded", () => {
   const toggleButton = document.getElementById("toggleButton");
   const languageSelect = document.getElementById("languageSelect");
+  const autoSummarizeCheckbox = document.getElementById(
+    "autoSummarizeCheckbox"
+  );
 
-  chrome.storage.local.get(["activatedSites", "language"], (result) => {
-    const activatedSites = result.activatedSites || [];
-    const language = result.language || "en-US";
-    languageSelect.value = language;
+  chrome.storage.local.get(
+    ["activatedSites", "language", "autoSummarizeOn"],
+    (result) => {
+      const activatedSites = result.activatedSites || [];
+      const language = result.language || "en-US";
+      const autoSummarizeOn = result.autoSummarizeOn || false;
 
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const currentSite = new URL(tabs[0].url).hostname;
-      if (activatedSites.includes(currentSite)) {
-        toggleButton.classList.add("enabled");
-      }
-    });
-  });
+      languageSelect.value = language;
+      autoSummarizeCheckbox.checked = autoSummarizeOn;
+
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const currentSite = new URL(tabs[0].url).hostname;
+        if (activatedSites.includes(currentSite)) {
+          toggleButton.classList.add("enabled");
+        }
+      });
+    }
+  );
 
   toggleButton.addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -48,6 +57,11 @@ document.addEventListener("DOMContentLoaded", () => {
   languageSelect.addEventListener("change", () => {
     const selectedLanguage = languageSelect.value;
     chrome.storage.local.set({ language: selectedLanguage });
+  });
+
+  autoSummarizeCheckbox.addEventListener("change", () => {
+    const autoSummarizeOn = autoSummarizeCheckbox.checked;
+    chrome.storage.local.set({ autoSummarizeOn });
   });
 });
 
