@@ -152,7 +152,11 @@ function addRecordButton(textArea) {
         try {
           recordButton.innerHTML = loadingIcon;
           recordButton.classList.add("loading");
-          finalTranscript = await aiCompletion(recognisedText, "summarize", 10);
+          finalTranscript = await aiCompletion(
+            recognisedText,
+            "summarize",
+            summarizeStrength
+          );
           await simulateBackspace(textArea, recognisedText.length, true);
           await simulateTyping(textArea, finalTranscript, true);
           recognisedText = "";
