@@ -11,7 +11,14 @@ var loadingIcon = '<i class="fas fa-spinner icon"></i>';
   document.head.appendChild(link);
 })();
 
-async function aiCompletion(prompt) {
+async function aiCompletion(content, task = "summarize", strength = 10) {
+  let prompt = "";
+  switch (task) {
+    case "summarize":
+      prompt = `You are a AI summarizer. Your task is to summarize the following content keeping the context exactly same. Also summarize accroding to the strength score 10 being the highly summarized and 0 being the least summarized.\n Strength score given is ${strength}. Only reply with the summarized content. Content:\n ${content}`;
+      break;
+  }
+
   try {
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
@@ -96,6 +103,7 @@ function addRecordButton(textArea) {
 
   let recognition;
   let autoSummarizeOn = false;
+  let summarizeStrength = 5;
   let recognisedText = "";
 
   if (!("webkitSpeechRecognition" in window)) {
@@ -127,21 +135,24 @@ function addRecordButton(textArea) {
       isRecording = true;
       recordButton.innerHTML = stopIcon;
       recordButton.classList.add("recording");
-      chrome.storage.local.get(["language", "autoSummarizeOn"], (result) => {
-        recognition.lang = result.language || "en-US";
-        autoSummarizeOn = result.autoSummarizeOn || false;
-        recognition.start();
-      });
+      chrome.storage.local.get(
+        ["language", "autoSummarizeOn", "summarizeStrength"],
+        (result) => {
+          recognition.lang = result.language || "en-US";
+          autoSummarizeOn = result.autoSummarizeOn || false;
+          summarizeStrength = result.summarizeStrength || 5;
+          recognition.start();
+        }
+      );
     } else {
       await recognition.stop();
       recordButton.classList.remove("recording");
       if (autoSummarizeOn) {
-        const query = `${recognisedText} \n Summarize the above text. Respond with only the summary nothing else.`;
         let finalTranscript = "";
         try {
           recordButton.innerHTML = loadingIcon;
           recordButton.classList.add("loading");
-          finalTranscript = await aiCompletion(query);
+          finalTranscript = await aiCompletion(recognisedText, "summarize", 10);
           await simulateBackspace(textArea, recognisedText.length, true);
           await simulateTyping(textArea, finalTranscript, true);
           recognisedText = "";

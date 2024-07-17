@@ -4,16 +4,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const autoSummarizeCheckbox = document.getElementById(
     "autoSummarizeCheckbox"
   );
+  const summarizeStrengthInput = document.getElementById(
+    "summarizeStrengthInput"
+  );
 
   chrome.storage.local.get(
-    ["activatedSites", "language", "autoSummarizeOn"],
+    ["activatedSites", "language", "autoSummarizeOn", "summarizeStrength"],
     (result) => {
       const activatedSites = result.activatedSites || [];
       const language = result.language || "en-US";
       const autoSummarizeOn = result.autoSummarizeOn || false;
+      const summarizeStrength = result.summarizeStrength || "";
 
       languageSelect.value = language;
       autoSummarizeCheckbox.checked = autoSummarizeOn;
+      summarizeStrengthInput.value = summarizeStrength;
 
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         const currentSite = new URL(tabs[0].url).hostname;
@@ -40,6 +45,9 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             toggleButton.classList.remove("enabled");
           });
+          languageSelect.disabled = true;
+          autoSummarizeCheckbox.disabled = true;
+          summarizeStrengthInput.disabled = true;
         } else {
           activatedSites.push(currentSite);
           chrome.storage.local.set({ activatedSites }, () => {
@@ -49,6 +57,11 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             toggleButton.classList.add("enabled");
           });
+          languageSelect.disabled = false;
+          autoSummarizeCheckbox.disabled = false;
+          if (autoSummarizeCheckbox.checked) {
+            summarizeStrengthInput.disabled = false;
+          }
         }
       });
     });
@@ -61,7 +74,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   autoSummarizeCheckbox.addEventListener("change", () => {
     const autoSummarizeOn = autoSummarizeCheckbox.checked;
+    summarizeStrengthInput.disabled = !autoSummarizeOn;
     chrome.storage.local.set({ autoSummarizeOn });
+  });
+
+  summarizeStrengthInput.addEventListener("change", () => {
+    const summarizeStrength = summarizeStrengthInput.value;
+    chrome.storage.local.set({ summarizeStrength });
   });
 });
 
