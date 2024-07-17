@@ -15,7 +15,7 @@ async function aiCompletion(content, task = "summarize", strength = 10) {
   let prompt = "";
   switch (task) {
     case "summarize":
-      prompt = `You are a AI summarizer. Your task is to summarize the following content keeping the context exactly same. Also summarize accroding to the strength score 10 being the highly summarized and 0 being the least summarized.\n Strength score given is ${strength}. Only reply with the summarized content. Content:\n ${content}`;
+      prompt = `You are a AI summarizer. Your task is to summarize the following content as its written, keeping the context exactly same. Also summarize accroding to the strength score 10 being the highly summarized and 0 being the least summarized.\n Strength score given is ${strength}. Only reply with the summarized content, striclty dont add anything else. Content:\n ${content}`;
       break;
   }
 
@@ -147,7 +147,7 @@ function addRecordButton(textArea) {
     } else {
       await recognition.stop();
       recordButton.classList.remove("recording");
-      if (autoSummarizeOn) {
+      if (autoSummarizeOn && recognisedText) {
         let finalTranscript = "";
         try {
           recordButton.innerHTML = loadingIcon;
