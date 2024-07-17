@@ -3,6 +3,11 @@
   <head>
     <title>Text Area</title>
     <style>
+      #textContainer {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 20px;
+      }
       textarea {
         width: 100%;
         height: 100px;
@@ -22,14 +27,20 @@
     <script>
       setTimeout(() => {
         const text3 = document.createElement("textarea");
-        const randomDiv = document.getElementById("random_div");
-        randomDiv.appendChild(text3);
-      }, 5000);
+        text3.placeholder = "Enter text";
+        document.getElementById("textContainer").appendChild(text3);
+      }, 3000);
+      setTimeout(() => {
+        const text3 = document.createElement("textarea");
+        text3.placeholder = "Enter text";
+        document.getElementById("textContainer").appendChild(text3);
+      }, 7000);
     </script>
   </head>
   <body>
-    <textarea id="text1" placeholder="Enter text here"></textarea>
-    <textarea id="text2" placeholder="Enter text here"></textarea>
-    <div id="random_div"></div>
+    <div id="textContainer">
+      <textarea id="text1" placeholder="Enter text here"></textarea>
+      <textarea id="text2" placeholder="Enter text here"></textarea>
+    </div>
   </body>
 </html>

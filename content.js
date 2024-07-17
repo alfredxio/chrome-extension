@@ -15,7 +15,7 @@ async function aiCompletion(content, task = "summarize", strength = 10) {
   let prompt = "";
   switch (task) {
     case "summarize":
-      prompt = `You are a AI summarizer. Your task is to summarize the following content as its written, keeping the context exactly same. Also summarize accroding to the strength score 10 being the highly summarized and 0 being the least summarized.\n Strength score given is ${strength}. Only reply with the summarized content, striclty dont add anything else. Content:\n ${content}`;
+      prompt = `You are a AI summarizer. Your task is to summarize the following content as its written, keeping the context exactly same. Also summarize according to the strength score; 10 being the highly summarized and 0 being the least summarized.\n Strength score is ${strength}. Only reply with the summarized content, striclty dont add anything else. Content:\n ${content}`;
       break;
   }
 
@@ -27,7 +27,7 @@ async function aiCompletion(content, task = "summarize", strength = 10) {
         headers: {
           "Content-Type": "application/json",
           Authorization:
-            "Bearer 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",
+            "Bearer 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",
         },
         body: JSON.stringify({
           messages: [
@@ -75,7 +75,9 @@ async function simulateBackspace(textArea, count, addDelay = false) {
     textArea.dispatchEvent(new Event("input", { bubbles: true }));
     textArea.dispatchEvent(new KeyboardEvent("keyup", { key: "Backspace" }));
     if (addDelay) {
-      await new Promise((resolve) => setTimeout(resolve, 5));
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.max(0, 10 - i / 2))
+      );
     }
   }
 }
@@ -157,7 +159,7 @@ function addRecordButton(textArea) {
             "summarize",
             summarizeStrength
           );
-          await simulateBackspace(textArea, recognisedText.length, true);
+          await simulateBackspace(textArea, recognisedText.length);
           await simulateTyping(textArea, finalTranscript, true);
           recognisedText = "";
         } catch (error) {

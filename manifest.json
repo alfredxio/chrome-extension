@@ -1,16 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Speech to Text Recorder",
+  "name": "SummarSpeak",
   "version": "1.0",
   "description": "Record speech and convert to text in any text area.",
-  "permissions": [
-    "activeTab",
-    "microphone",
-    "scripting",
-    "storage",
-    "tabs",
-    "<all_urls>"
-  ],
+  "permissions": ["activeTab", "microphone", "scripting", "storage", "tabs"],
   "background": {
     "service_worker": "background.js"
   },
@@ -22,7 +15,13 @@
       "run_at": "document_idle"
     }
   ],
+  "host_permissions": ["<all_urls>"],
   "action": {
     "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
   }
 }

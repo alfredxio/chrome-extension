@@ -79,7 +79,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   summarizeStrengthInput.addEventListener("change", () => {
-    const summarizeStrength = summarizeStrengthInput.value;
+    let summarizeStrength = Math.min(
+      10,
+      Math.max(0, summarizeStrengthInput?.value || 0)
+    );
+    summarizeStrengthInput.value = summarizeStrength;
     chrome.storage.local.set({ summarizeStrength });
   });
 });

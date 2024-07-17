@@ -1,6 +1,11 @@
 .record-button {
-  background-color: #bfbfbf;
-  color: rgb(36, 36, 36);
+  background: rgb(238, 174, 202);
+  background: radial-gradient(
+    circle,
+    rgba(238, 174, 202, 1) 0%,
+    rgba(148, 187, 233, 1) 100%
+  );
+  color: rgba(2, 0, 36, 1);
   border: none;
   height: 35px;
   width: 35px;
@@ -15,6 +20,8 @@
   bottom: 5px;
   right: 5px;
   z-index: 10;
+  opacity: 0.75;
+  transition: all 0.3s;
 }
 
 .recording {
@@ -26,9 +33,27 @@
   animation: spin 2s infinite linear;
 }
 
+.recording,
+.loading {
+  opacity: 1;
+}
+
 .fa-stop {
   overflow: hidden;
   font-size: 10px;
+}
+
+.icon {
+  transition: all 0.3s;
+}
+
+.record-button:hover {
+  opacity: 1;
+  scale: 0.85;
+
+  .icon {
+    scale: 1.1;
+  }
 }
 
 @keyframes pulse {
